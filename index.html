@@ -226,7 +226,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
       </pre>
       <div class="subtitle">
         <strong>Willkommen auf dem Server, der alle Daten über mich enthält.</strong>
-        
       </div>
     </section>
 
@@ -274,6 +273,87 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
 
     let currentLang = "de";
 
+    // Virtuelles "Dateisystem" für ls/dir
+    const VIRTUAL_FILES = [
+      "berufserfahrung",
+      "studium",
+      "zertifikate",
+      "ich",
+      "help",
+      "secret_commands.txt"
+    ];
+
+    const SECRET_COMMANDS_FILE = {
+      de: [
+        "",
+        "secret_commands.txt",
+        "──────────────────",
+        "„Geheime“ Spaß-Befehle (harmlos, nur Gags):",
+        "  sudo su -",
+        "  sudo su - root",
+        "  su root",
+        "  cat /etc/passwd",
+        "  cat /etc/shadow",
+        "  rm -rf /",
+        "  shutdown -h now",
+        "  env  |  printenv",
+        "  ping <ziel>",
+        "  find / -name <muster>",
+        "",
+        "Hinweis: In dieser CV-Sandbox wird nichts wirklich ausgeführt."
+      ],
+      es: [
+        "",
+        "secret_commands.txt",
+        "──────────────────",
+        "Comandos “secretos” de broma (inofensivos, solo respuestas divertidas):",
+        "  sudo su -",
+        "  sudo su - root",
+        "  su root",
+        "  cat /etc/passwd",
+        "  cat /etc/shadow",
+        "  rm -rf /",
+        "  shutdown -h now",
+        "  env  |  printenv",
+        "  ping <objetivo>",
+        "  find / -name <patrón>",
+        "",
+        "Nota: en esta sandbox del CV no se ejecuta nada peligroso."
+      ]
+    };
+
+    function renderLs(partsLower, lang) {
+      const flags = partsLower.slice(1).filter(p => p.startsWith("-")).join("");
+      const long = flags.includes("l");
+      const all = flags.includes("a");
+
+      const files = [...VIRTUAL_FILES];
+      if (all) files.unshift(".", "..");
+
+      if (!long) {
+        return [
+          "",
+          files.join("  "),
+          ""
+        ];
+      }
+
+      const rows = files.map(name => {
+        const isDir = (name !== "secret_commands.txt");
+        const perms = isDir ? "drwxr-xr-x" : "-rw-r--r--";
+        const size  = isDir ? "4096" : "512";
+        const date  = "Nov 30  2025";
+        return `${perms}  1 ruben ruben  ${size.padStart(5, " ")}  ${date}  ${name}`;
+      });
+
+      return [
+        "",
+        `total ${files.length}`,
+        ...rows,
+        ""
+      ];
+    }
+
     const LANGUAGE_DATA = {
       de: {
         hintHTML: 'Tipp: Schreib <code>help</code>, um alle verfügbaren Befehle zu sehen.',
@@ -293,11 +373,11 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
           "Bildschirm geleert.",
           "Tipp \"help\" ein, um alle verfügbaren Befehle zu sehen."
         ],
+        // (bleibt aus Kompatibilitätsgründen, wird aber nicht mehr genutzt)
         lsLines: [
           "",
-          "berufserfahrung  studium  zertifikate  ich  help",
-          "",
-          
+          "berufserfahrung  studium  zertifikate  ich  help  secret_commands.txt",
+          ""
         ],
         whoamiLines: [
           "",
@@ -503,11 +583,11 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
           "Pantalla limpiada.",
           "Escribe \"help\" para ver todos los comandos disponibles."
         ],
+        // (bleibt aus Kompatibilitätsgründen, wird aber nicht mehr genutzt)
         lsLines: [
           "",
-          "berufserfahrung  studium  zertifikate  ich  help",
-          "",
-          "Nota: esto es una simulación, pero el contenido sí es real."
+          "berufserfahrung  studium  zertifikate  ich  help  secret_commands.txt",
+          ""
         ],
         whoamiLines: [
           "",
@@ -751,8 +831,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             "root:x:0:0:Bank-Root:/root:/bin/bash",
             "ruben:x:1000:1000:IT-Security-Administrator:/home/ruben:/bin/zsh",
             "socbot:x:1337:1337:Alarmiert, wenn du zu neugierig wirst:/var/log:/usr/sbin/nologin",
-            "",
-            
+            ""
           ];
         } else {
           return [
@@ -760,8 +839,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             "root:x:0:0:Bank-Root:/root:/bin/bash",
             "ruben:x:1000:1000:IT-Security-Administrator:/home/ruben:/bin/zsh",
             "socbot:x:1337:1337:Alerta cuando te pones demasiado curioso:/var/log:/usr/sbin/nologin",
-            "",
-            
+            ""
           ];
         }
       }
@@ -919,11 +997,39 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
       return null;
     }
 
+    // -----------------------------
+    // Sticky auto-scroll (no secuestra si el usuario sube)
+    // -----------------------------
+    let scrollPending = false;
+
+    function isNearBottom(thresholdPx = 24) {
+      return (screen.scrollHeight - screen.scrollTop - screen.clientHeight) < thresholdPx;
+    }
+
+    function scrollToBottom() {
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function scheduleScrollToBottom() {
+      if (scrollPending) return;
+      scrollPending = true;
+
+      requestAnimationFrame(() => {
+        scrollToBottom();
+        cmdInput.scrollIntoView({ block: "nearest" });
+        scrollPending = false;
+      });
+    }
+
     function addLine(text, className = "") {
+      const shouldAutoScroll = isNearBottom(); // antes de añadir
+
       const div = document.createElement("div");
       div.className = "line" + (className ? " " + className : "");
       div.textContent = text;
       screen.appendChild(div);
+
+      if (shouldAutoScroll) scheduleScrollToBottom();
     }
 
     function addBlock(lines, className = "") {
@@ -932,10 +1038,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
 
     function addPromptEcho(command) {
       addLine(`${PROMPT_TEXT} ${command}`);
-    }
-
-    function scrollToBottom() {
-      screen.scrollTop = screen.scrollHeight;
     }
 
     function handleClear() {
@@ -996,7 +1098,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
 
       // Kleine Shell-Boni
       if (canonical === "ls" || canonical === "dir") {
-        addBlock(langData.lsLines, "dim");
+        addBlock(renderLs(parts, currentLang), "dim");
         return;
       }
 
@@ -1011,7 +1113,17 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
       }
 
       if (first === "cat") {
-        addBlock(langData.catGenericLines, "muted");
+        const target = parts.slice(1).join(" ").trim();
+        const isSecretFile =
+          target === "secret_commands.txt" ||
+          target.endsWith("/secret_commands.txt") ||
+          target.endsWith("./secret_commands.txt");
+
+        if (isSecretFile) {
+          addBlock(SECRET_COMMANDS_FILE[currentLang], "accent");
+        } else {
+          addBlock(langData.catGenericLines, "muted");
+        }
         return;
       }
 
@@ -1052,7 +1164,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
         const value = cmdInput.value;
         cmdInput.value = "";
         handleCommand(value);
-        scrollToBottom();
+        // Importante: NO forzamos scroll aquí; addLine ya lo hace si estás abajo.
         setTimeout(() => cmdInput.focus(), 0);
       }
     });
