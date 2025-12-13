@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>lebenslauf-terminal-ruben</title>
+  <style>
+    :root{
+      --bg:#050705;
+      --bg-2:#070b07;
+      --green:#9CFF9C;
+      --green-dim:#6fdc6f;
+      --amber:#ffd479;
+      --muted:#9bb39b;
+      --danger:#ff8a8a;
+      --accent:#8cf7ff;
+      --shadow: rgba(0,0,0,0.6);
+      --radius: 14px;
+      --font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--green);
+      background:
+        radial-gradient(1200px 700px at 15% 10%, rgba(70,255,120,0.06), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(140,247,255,0.06), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding: clamp(10px, 2vw, 26px);
+    }
+
+    .frame{
+      width:min(1100px, 100%);
+      margin:auto;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      padding: clamp(10px, 1.8vw, 20px);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0));
+      box-shadow:
+        0 20px 60px var(--shadow),
+        inset 0 0 0 1px rgba(140,255,140,0.08);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .frame::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(
+          rgba(255,255,255,0.02) 1px,
+          transparent 1px
+        );
+      background-size: 100% 3px;
+      pointer-events:none;
+      opacity:0.35;
+      mix-blend-mode: overlay;
+    }
+
+    .banner{
+      position:relative;
+      padding: clamp(10px, 1.6vw, 18px);
+      border-radius: calc(var(--radius) - 4px);
+      background:
+        linear-gradient(180deg, rgba(140,255,140,0.06), rgba(140,255,140,0.0));
+      box-shadow: inset 0 0 0 1px rgba(140,255,140,0.08);
+    }
+
+    .banner pre{
+      margin:0;
+      white-space: pre;
+      overflow-x:auto;
+      font-size: clamp(9px, 1.1vw, 13px);
+      line-height: 1.15;
+      color: var(--green);
+    }
+
+    .banner .subtitle{
+      margin-top: 8px;
+      font-size: clamp(10px, 1.25vw, 14px);
+      color: var(--muted);
+    }
+    .banner .subtitle strong{ color: var(--amber); font-weight:600; }
+
+    .terminal{
+      position:relative;
+      flex:1;
+      min-height: 360px;
+      border-radius: calc(var(--radius) - 4px);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.45));
+      box-shadow:
+        inset 0 0 0 1px rgba(140,255,140,0.08);
+      padding: clamp(12px, 1.6vw, 18px);
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    #screen{
+      flex:1;
+      overflow-y:auto;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(140,255,140,0.35) transparent;
+    }
+    #screen::-webkit-scrollbar{ width: 8px; }
+    #screen::-webkit-scrollbar-thumb{
+      background: rgba(140,255,140,0.25);
+      border-radius: 8px;
+    }
+
+    .line{
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: clamp(12px, 1.35vw, 15px);
+      line-height: 1.45;
+      margin: 0 0 2px 0;
+    }
+
+    .line.dim{ color: var(--green-dim); }
+    .line.muted{ color: var(--muted); }
+    .line.amber{ color: var(--amber); }
+    .line.danger{ color: var(--danger); }
+    .line.accent{ color: var(--accent); }
+
+    .input-row{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(140,255,140,0.08);
+    }
+
+    .prompt{
+      flex:0 0 auto;
+      font-size: clamp(12px, 1.35vw, 15px);
+      color: var(--green);
+    }
+    .prompt .host{ color: var(--amber); }
+    .prompt .path{ color: var(--accent); }
+
+    #cmd{
+      flex:1 1 auto;
+      min-width: 100px;
+      font-family: var(--font);
+      font-size: clamp(12px, 1.35vw, 15px);
+      color: var(--green);
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 2px 0;
+      caret-color: var(--green);
+    }
+
+    .hint-pill{
+      align-self:flex-start;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(140,255,140,0.06);
+      box-shadow: inset 0 0 0 1px rgba(140,255,140,0.08);
+      font-size: clamp(10px, 1.1vw, 12px);
+      color: var(--muted);
+    }
+    .hint-pill code{
+      color: var(--amber);
+      background: transparent;
+      padding: 0;
+      font-family: var(--font);
+      font-size: 1em;
+    }
+
+    @media (max-width: 520px){
+      .input-row{ flex-wrap: wrap; }
+      .prompt{ width: 100%; }
+      #cmd{ width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="frame" aria-label="Interaktive Lebenslauf-Terminalseite">
+    <section class="banner" aria-label="SSH-Banner">
+      <pre>
+  $$\                $$\                                     $$\                      $$$$$$\                         
+$$ |               $$ |                                    $$ |                    $$  __$$\                        
+$$ |      $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$$\ $$ | $$$$$$\  $$\   $$\ $$ /  \__|                       
+$$ |     $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  _____|$$ | \____$$\ $$ |  $$ |$$$$\                            
+$$ |     $$$$$$$$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |\$$$$$$\  $$ | $$$$$$$ |$$ |  $$ |$$  _|                           
+$$ |     $$   ____|$$ |  $$ |$$   ____|$$ |  $$ | \____$$\ $$ |$$  __$$ |$$ |  $$ |$$ |                             
+$$$$$$$$\\$$$$$$$\ $$$$$$$  |\$$$$$$$\ $$ |  $$ |$$$$$$$  |$$ |\$$$$$$$ |\$$$$$$  |$$ |                             
+\________|\_______|\_______/  \_______|\__|  \__|\_______/ \__| \_______| \______/ \__|                             
+                                                                                                                    
+                                                                                                                    
+                                                                                                                    
+$$$$$$$\            $$\                                  $$$$$$\                                  $$\               
+$$  __$$\           $$ |                                $$  __$$\                                 $$ |              
+$$ |  $$ |$$\   $$\ $$$$$$$\   $$$$$$\  $$$$$$$\        $$ /  $$ | $$$$$$$\  $$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\  
+$$$$$$$  |$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\       $$$$$$$$ |$$  _____|$$  __$$\ $$  _____|\_$$  _|   \____$$\ 
+$$  __$$< $$ |  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |      $$  __$$ |$$ /      $$ /  $$ |\$$$$$$\    $$ |     $$$$$$$ |
+$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |      $$ |  $$ |$$ |      $$ |  $$ | \____$$\   $$ |$$\ $$  __$$ |
+$$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$$$$  |$$$$$$$  |  \$$$$  |\$$$$$$$ |
+\__|  \__| \______/ \_______/  \_______|\__|  \__|      \__|  \__| \_______| \______/ \_______/    \____/  \_______|
+                                                                                                                    
+                                                                                                                    
+                                                                                                                    
+                                     $$$$$$\                                                                        
+                                    $$  __$$\                                                                       
+                                    $$ /  \__| $$$$$$\  $$$$$$$\  $$$$$$$$\                                         
+                                    \$$$$$$\   \____$$\ $$  __$$\ \____$$  |                                        
+                                     \____$$\  $$$$$$$ |$$ |  $$ |  $$$$ _/                                         
+                                    $$\   $$ |$$  __$$ |$$ |  $$ | $$  _/                                           
+                                    \$$$$$$  |\$$$$$$$ |$$ |  $$ |$$$$$$$$\                                         
+                                     \______/  \_______|\__|  \__|\________|                      
+      </pre>
+      <div class="subtitle">
+        <strong>Willkommen auf dem Server, der alle Daten über mich enthält.</strong>
+        
+      </div>
+    </section>
+
+    <section class="terminal">
+      <div class="hint-pill" id="hint">Tipp: Schreib <code>help</code>, um alle verfügbaren Befehle zu sehen.</div>
+      <div id="screen" role="log" aria-live="polite" aria-relevant="additions text"></div>
+
+      <div class="input-row">
+        <div class="prompt">
+          <span class="user">ruben</span><span class="dim">@</span><span class="host">lebenslauf</span><span class="dim">:</span><span class="path">~</span><span class="dim">$</span>
+        </div>
+        <input id="cmd" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="Befehl eingeben" />
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /*
+      -------------------------------------------------------------------------
+      Sprachlogik:
+      - Startsprache: Deutsch (de)
+      - Mit "sprache" oder "idioma" (Alias: language) wird zwischen de/es gewechselt.
+      - Alle Ausgaben (help, ich, berufserfahrung, studium, zertifikate, usw.)
+        hängen von der aktuellen Sprache ab.
+      -------------------------------------------------------------------------
+    */
+
+    const screen = document.getElementById("screen");
+    const cmdInput = document.getElementById("cmd");
+    const hintEl = document.getElementById("hint");
+
+    const PROMPT_TEXT = "ruben@lebenslauf:~$";
+
+    // Aliase: Eingaben werden auf kanonische Befehle gemappt
+    const ALIASES = new Map([
+      ["about", "ich"],
+      ["work", "berufserfahrung"],
+      ["studies", "studium"],
+      ["certifications", "zertifikate"],
+      ["certs", "zertifikate"],
+      ["cls", "clear"],
+      ["sprache", "language"],
+      ["idioma", "language"]
+    ]);
+
+    let currentLang = "de";
+
+    const LANGUAGE_DATA = {
+      de: {
+        hintHTML: 'Tipp: Schreib <code>help</code>, um alle verfügbaren Befehle zu sehen.',
+        helpLines: [
+          "",
+          "Verfügbare Befehle:",
+          "  ich               → Kurzfassung darüber, wer ich bin.",
+          "  berufserfahrung   → Zeigt meine berufliche Erfahrung.",
+          "  studium           → Zeigt meine Studien / Ausbildung.",
+          "  zertifikate       → Zeigt meine Zertifizierungen.",
+          "  sprache           → Sprache zwischen Deutsch und Spanisch wechseln.",
+          "  clear             → Löscht den Bildschirm.",
+          "",
+          "Versuche ruhig weitere Befehle selbst... aber sei vorsichtig!"
+        ],
+        clearLines: [
+          "Bildschirm geleert.",
+          "Tipp \"help\" ein, um alle verfügbaren Befehle zu sehen."
+        ],
+        lsLines: [
+          "",
+          "berufserfahrung  studium  zertifikate  ich  help",
+          "",
+          
+        ],
+        whoamiLines: [
+          "",
+          "ruben",
+          "IT-Security-Administrator / SOC-Analyst in Frankfurt"
+        ],
+        pwdLines: [
+          "",
+          "/home/ruben/lebenslauf"
+        ],
+        catGenericLines: [
+          "",
+          "cat: Zugriff auf diese Datei ist in der Lebenslauf-Sandbox eingeschränkt.",
+          "Wenn du Informationen willst, nutze lieber: ich, berufserfahrung, studium, zertifikate."
+        ],
+        unknown: (cmd) => [
+          `Befehl nicht gefunden: ${cmd}`,
+          `Tipp "help" ein, um alle verfügbaren Befehle zu sehen.`
+        ],
+        commands: {
+          ich: [
+            "",
+            "Kurzprofil",
+            "──────────",
+            "Ich bin Rubén, IT Security Administrator in Frankfurt am Main und seit",
+            "2012 in Deutschland. Ich habe in Rechenzentren, im technischen Field",
+            "Service, als Penetration Tester und heute in der IT-Sicherheit einer",
+            "Bank gearbeitet – immer nah an Systemen, Netzwerken und echten Angriffs-",
+            "szenarien.",
+            "",
+            "Ich bin eher extrovertiert, lache gern und erkläre komplexe technische",
+            "Themen so, dass auch Nicht-Techniker mitkommen. Ich lebe mit meiner Frau",
+            "und unseren zwei Kindern in Frankfurt und meine Laufbahn bewegt sich",
+            "zwischen meiner Leidenschaft für die Administration von Cybersecurity-",
+            "Systemen bei der KfW und der Neugier, ständig neue Fähigkeiten zu lernen.",
+            "",
+            "Interessen:",
+            "  • Offensive und defensive IT-Sicherheit",
+            "  • Verbindung von Red-Team- und SOC-Perspektive",
+            "  • Administration und Management von Linux-Systemen",
+            "  • Neues Wissen rund um Automatisierung erwerben",
+            "  • Neues Wissen lernen und weitergeben.",
+            "",
+            "Mein Ziel:",
+            "Security, die in der Praxis funktioniert – verständlich und skalierbar."
+          ],
+          berufserfahrung: [
+            "",
+            "Berufserfahrung",
+            "───────────────",
+            "",
+            "Seit 11/2020 | IT Security Administrator",
+            "             | KfW Bankengruppe, Frankfurt am Main, Deutschland",
+            "             |",
+            "             |  • Linux-Administration in einer kritischen Infrastruktur",
+            "             |  • Installation und Konfiguration von Security-Tools",
+            "             |  • Datenbank- und Index-Management",
+            "             |  • Distributed File Systems & Cluster-Konfigurationen",
+            "             |  • Backup- und Restore-Konzepte",
+            "             |  • Firewall-Management",
+            "             |  • Troubleshooting in komplexen Umgebungen",
+            "             |  • Vulnerability Management",
+            "             |  • Aufbau und Betreuung von Honeypots",
+            "",
+            "02/2020 – 06/2020 | Penetration Tester",
+            "                  | Eurosec, Frankfurt am Main, Deutschland",
+            "                  |",
+            "                  |  • Durchführung technischer Sicherheitsprüfungen",
+            "                  |    und Penetrationstests",
+            "                  |  • Sicherheits-Audits und Beurteilung von Findings",
+            "                  |  • Ableitung von Maßnahmen und Handlungsempfehlungen",
+            "                  |  • Dokumentation der Ergebnisse für Kunden",
+            "",
+            "01/2017 – 02/2018 | Site Manager",
+            "                  | wtec AG, Frankfurt am Main, Deutschland",
+            "                  |",
+            "                  |  • Umsetzung technischer Projekte vor Ort in",
+            "                  |    Rechenzentrums- und Infrastruktur-Umgebungen",
+            "                  |  • Koordination von Zeitplanung und Ressourcen",
+            "                  |  • Abstimmung mit Kunden und Techniker-Teams",
+            "",
+            "07/2016 – 12/2016 | Data Center Technician",
+            "                  | wtec AG, Frankfurt/Rhein-Main, Deutschland",
+            "                  |",
+            "                  |  • Aufbau von Data-Center-Verkabelungsinfrastrukturen",
+            "                  |  • Vermessung von Kupfer- und Glasfaserleitungen",
+            "                  |    nach Standards",
+            "                  |  • Installation von Racks und Racking-Komponenten",
+            "",
+            "04/2015 – 09/2015 | Server Build Technician",
+            "                  | SoftLayer, an IBM Company, Frankfurt/Rhein-Main",
+            "                  |",
+            "                  |  • Aufbau und Konfiguration von Racks und Intel-Servern",
+            "                  |    nach Kundenbestellung",
+            "                  |  • Installation und Konfiguration von Betriebssystemen",
+            "                  |    und RAID-Systemen",
+            "                  |  • Konfiguration der Netzwerkumgebung",
+            "                  |  • Kupfer- und Glasfaserkabel-Verkabelung",
+            "                  |  • Hardware-Installation und -Demontage nach genauer",
+            "                  |    Dokumentation",
+            "                  |  • Testing und Qualitätssicherung von Serverhardware",
+            "                  |    (inkl. Cisco Layer-2-Netzwerkkomponenten)",
+            "                  |  • Bearbeitung von Anfragen und Bestellungen über",
+            "                  |    Ticketsysteme sowie Troubleshooting gemäß SLAs",
+            "",
+            "Diese Stationen geben mir heute im SOC- und Security-Umfeld einen sehr",
+            "praktischen Blick auf Infrastruktur, Angriffswege und sinnvolle Abwehr."
+          ],
+          studium: [
+            "",
+            "Studium / Ausbildung",
+            "────────────────────",
+            "",
+            "2019 – 2019 | Expert Course Cybersecurity",
+            "            | Comunix – Ethical Hacking School / SION Certifications",
+            "            |",
+            "            | Inhalte (Auszug):",
+            "            |  • Linux System Administration",
+            "            |  • Windows Server 2016",
+            "            |  • Kali Linux",
+            "            |  • Footprinting, Enumeration, Vulnerability Assessment",
+            "            |  • System Hacking, Web- und Wireless-Hacking",
+            "            |  • Sniffing, Social Engineering, SQL Injection, Kryptografie",
+            "            |  • Honeypots, Buffer Overflows, Privilege Escalation",
+            "            |  • Cracking, Metasploit",
+            "            |  • Bash/Python-Scripting, Client-Side-Angriffe",
+            "            |  • Hacking with PowerShell",
+            "",
+            "2016 – 2019 | Fachinformatiker für Systemintegration",
+            "            | IES ORETANIA",
+            "            | (höhere Berufsbildung in Systemintegration und Netzwerken)",
+            "            |",
+            "            |  • Hypertext Markup Language & Informationssysteme",
+            "            |  • Hardware-Grundlagen",
+            "            |  • Netzadministration",
+            "            |  • Implementierung von Betriebssystemen",
+            "            |  • Netzwerk- und Internetdienste",
+            "            |  • Cybersecurity & High Availability",
+            "            |  • Datenbank-Administration",
+            "            |  • ca. 2000 zertifizierte Ausbildungsstunden",
+            "",
+            "2014 – 2016 | Ausbildung in Mikrocomputersystemen und Netzwerken",
+            "            | IES ILERNA",
+            "            | (mittlere Berufsbildung – Mikrocomputer- und Netzwerksysteme)",
+            "            |",
+            "            |  • Einbenutzer- und Netzwerkbetriebssysteme",
+            "            |  • Installation & Wartung von Computer-Systemen",
+            "            |  • Cybersecurity, Web-Anwendungen, Netzwerkdienste",
+            "            |  • Lokale Netzwerke, Technical English",
+            "            |  • ca. 2000 zertifizierte Ausbildungsstunden",
+            "",
+            "Praxisprojekt:",
+            "  • \"Red Team Operations: Proof of Concept in a real environment\"",
+            "    – Abschlussprojekt während der Ausbildung zum Fachinformatiker für",
+            "      Systemintegration am IES Oretania mit realistischem Schul-/",
+            "      Unternehmens-Szenario (Footprinting, Fingerprinting, Enumeration,",
+            "      Exploitation usw.)"
+          ],
+          zertifikate: [
+            "",
+            "Zertifikate",
+            "───────────",
+            "  • Certified Ethical Hacker (CEH)",
+            "      - EC-Council",
+            "      - Ausgestellt: 06/2020",
+            "",
+            "  • CompTIA PenTest+",
+            "      - CompTIA",
+            "      - Ausgestellt: 07/2020",
+            "",
+            "Relevante Kenntnisse aus Kursen & Praxis (Auszug)",
+            "──────────────────────────────────────────────",
+            "  • Penetrationstests & Red-Team-Methoden",
+            "  • Metasploit, Kali Linux, Nmap, Nessus",
+            "  • Hacking with PowerShell, Bash- und Python-Scripting",
+            "  • Honeypots, Wireless Security, Web Application Security",
+            "  • IBM Server Hardware, Data Center & Netzwerkgrundlagen",
+            "",
+            "Soft Skills & Arbeitsweise",
+            "──────────────────────────",
+            "  • Teamwork, Projektorganisation, dokumentationsstarke Arbeitsweise",
+            "  • Fähigkeit, technische Inhalte für unterschiedliche Zielgruppen",
+            "    verständlich aufzubereiten",
+            "  • Hohe Lernbereitschaft – insbesondere Sprachen & neue Security-Themen"
+          ]
+        }
+      },
+      es: {
+        hintHTML: 'Pista: escribe <code>help</code> para ver todos los comandos disponibles.',
+        helpLines: [
+          "",
+          "Comandos disponibles:",
+          "  ich               → Resumen breve sobre quién soy.",
+          "  berufserfahrung   → Muestra mi experiencia profesional.",
+          "  studium           → Muestra mi formación.",
+          "  zertifikate       → Muestra mis certificaciones.",
+          "  idioma            → Cambiar el idioma entre alemán y español.",
+          "  clear             → Limpia la pantalla.",
+          "",
+          "Prueba otros comandos por tu cuenta... pero con cuidado ;)"
+        ],
+        clearLines: [
+          "Pantalla limpiada.",
+          "Escribe \"help\" para ver todos los comandos disponibles."
+        ],
+        lsLines: [
+          "",
+          "berufserfahrung  studium  zertifikate  ich  help",
+          "",
+          "Nota: esto es una simulación, pero el contenido sí es real."
+        ],
+        whoamiLines: [
+          "",
+          "ruben",
+          "Administrador de seguridad informática / analista SOC en Fráncfort"
+        ],
+        pwdLines: [
+          "",
+          "/home/ruben/lebenslauf"
+        ],
+        catGenericLines: [
+          "",
+          "cat: el acceso a este fichero está limitado en este entorno de currículum.",
+          "Si quieres información usa mejor: ich, berufserfahrung, studium, zertifikate."
+        ],
+        unknown: (cmd) => [
+          `Comando no encontrado: ${cmd}`,
+          `Escribe \"help\" para ver todos los comandos disponibles.`
+        ],
+        commands: {
+          ich: [
+            "",
+            "Perfil breve",
+            "────────────",
+            "Soy Rubén, administrador de seguridad informática en Fráncfort del Meno",
+            "y vivo en Alemania desde 2012. He trabajado en centros de datos, en field",
+            "service técnico, como penetration tester y ahora en la seguridad de una",
+            "entidad financiera, siempre muy cerca de sistemas, redes y entornos",
+            "reales de ataque.",
+            "",
+            "Soy más bien extrovertido, con bastante sentido del humor y me gusta",
+            "explicar temas técnicos complejos de forma que también los entiendan",
+            "personas no técnicas. Vivo en Fráncfort con mi mujer y nuestros dos hijos,",
+            "y mi carrera se mueve entre mi pasión por la administración de sistemas de",
+            "ciberseguridad en KfW y la curiosidad por aprender nuevas habilidades.",
+            "",
+            "Intereses:",
+            "  • Seguridad ofensiva y defensiva",
+            "  • Conectar la visión Red Team con la del SOC",
+            "  • Administración y gestión de sistemas Linux",
+            "  • Adquirir nuevos conocimientos relacionados con la automatización",
+            "  • Aprender cosas nuevas y transmitirlas.",
+            "",
+            "Mi objetivo:",
+            "Seguridad que funcione en la práctica: clara, útil y escalable."
+          ],
+          berufserfahrung: [
+            "",
+            "Experiencia profesional",
+            "───────────────────────",
+            "",
+            "Desde 11/2020 | IT Security Administrator",
+            "              | KfW Bankengruppe, Fráncfort del Meno, Alemania",
+            "              |",
+            "              |  • Administración de sistemas Linux en un entorno crítico",
+            "              |  • Instalación y configuración de herramientas de seguridad",
+            "              |  • Gestión de bases de datos/índices",
+            "              |  • Sistemas de ficheros distribuidos y configuración",
+            "              |    de clústeres",
+            "              |  • Backups y planes de restauración",
+            "              |  • Gestión de cortafuegos",
+            "              |  • Resolución de incidencias en entornos complejos",
+            "              |  • Vulnerability Management",
+            "              |  • Diseño y operación de honeypots",
+            "",
+            "02/2020 – 06/2020 | Penetration Tester",
+            "                  | Eurosec, Fráncfort del Meno, Alemania",
+            "                  |",
+            "                  |  • Realización de auditorías de seguridad y pentests",
+            "                  |  • Evaluación de hallazgos y definición de medidas",
+            "                  |    de mitigación",
+            "                  |  • Elaboración de informes técnicos para clientes",
+            "",
+            "01/2017 – 02/2018 | Site Manager",
+            "                  | wtec AG, Fráncfort del Meno, Alemania",
+            "                  |",
+            "                  |  • Ejecución de proyectos técnicos on-site en",
+            "                  |    infraestructuras y centros de datos",
+            "                  |  • Planificación de tiempos y recursos",
+            "                  |  • Coordinación con clientes y equipos técnicos",
+            "",
+            "07/2016 – 12/2016 | Data Center Technician",
+            "                  | wtec AG, región Rin-Meno, Alemania",
+            "                  |",
+            "                  |  • Cableado de infraestructuras de centro de datos",
+            "                  |  • Medición de cobre y fibra siguiendo estándares",
+            "                  |  • Instalación de racks y dispositivos de rack",
+            "",
+            "04/2015 – 09/2015 | Server Build Technician",
+            "                  | SoftLayer, an IBM Company, región Rin-Meno",
+            "                  |",
+            "                  |  • Montaje y configuración de racks y servidores",
+            "                  |    Intel según pedidos de cliente",
+            "                  |  • Instalación y configuración de sistemas operativos",
+            "                  |    y sistemas RAID",
+            "                  |  • Configuración del entorno de red",
+            "                  |  • Cableado de cobre y fibra",
+            "                  |  • Instalación y retirada de hardware siguiendo",
+            "                  |    documentación detallada",
+            "                  |  • Testing y aseguramiento de calidad de hardware",
+            "                  |    de servidor (incluyendo equipamiento Cisco capa 2)",
+            "                  |  • Gestión de solicitudes y pedidos por sistema de",
+            "                  |    tickets y troubleshooting bajo acuerdos de SLA",
+            "",
+            "En conjunto, estas etapas me dan una visión muy práctica de la",
+            "infraestructura, los vectores de ataque y las defensas que tienen sentido",
+            "en un entorno real."
+          ],
+          studium: [
+            "",
+            "Formación académica",
+            "───────────────────",
+            "",
+            "2019 – 2019 | Expert Course in Cybersecurity",
+            "            | Comunix – Ethical Hacking School / SION Certifications",
+            "            |",
+            "            | Contenidos (resumen):",
+            "            |  • Administración de sistemas Linux",
+            "            |  • Windows Server 2016",
+            "            |  • Kali Linux",
+            "            |  • Footprinting, enumeración y análisis de vulnerabilidades",
+            "            |  • System Hacking, hacking web y wireless",
+            "            |  • Sniffing, ingeniería social, SQL injection, criptografía",
+            "            |  • Honeypots, buffer overflows, escalado de privilegios",
+            "            |  • Cracking, Metasploit",
+            "            |  • Scripting en Bash y Python",
+            "            |  • Hacking con PowerShell",
+            "",
+            "2016 – 2019 | Fachinformatiker für Systemintegration",
+            "            | IES ORETANIA",
+            "            | Formación profesional superior en integración de sistemas",
+            "            |",
+            "            |  • Lenguaje de marcas e información",
+            "            |  • Fundamentos de hardware",
+            "            |  • Administración de redes",
+            "            |  • Implementación de sistemas operativos",
+            "            |  • Servicios de red e Internet",
+            "            |  • Ciberseguridad y alta disponibilidad",
+            "            |  • Administración de bases de datos",
+            "            |  • ~2000 horas certificadas",
+            "",
+            "2014 – 2016 | Formación en microinformática y redes",
+            "            | IES ILERNA",
+            "            | Ciclo formativo de grado medio",
+            "            |",
+            "            |  • Sistemas operativos mono-usuario y en red",
+            "            |  • Instalación y mantenimiento de equipos",
+            "            |  • Ciberseguridad, aplicaciones web y servicios de red",
+            "            |  • Redes locales, inglés técnico",
+            "            |  • ~2000 horas certificadas",
+            "",
+            "Proyecto práctico:",
+            "  • \"Red Team Operations: Proof of Concept in a real environment\"",
+            "    – Proyecto final durante la formación de Fachinformatiker für",
+            "      Systemintegration en el IES Oretania, con un escenario realista",
+            "      de centro educativo/empresa (footprinting, fingerprinting,",
+            "      enumeración, explotación, etc.)."
+          ],
+          zertifikate: [
+            "",
+            "Certificados",
+            "────────────",
+            "  • Certified Ethical Hacker (CEH)",
+            "      - EC-Council",
+            "      - Fecha de expedición: 06/2020",
+            "",
+            "  • CompTIA PenTest+",
+            "      - CompTIA",
+            "      - Fecha de expedición: 07/2020",
+            "",
+            "Conocimientos relevantes adquiridos en cursos y práctica",
+            "───────────────────────────────────────────────────────",
+            "  • Pentesting y metodologías de Red Team",
+            "  • Metasploit, Kali Linux, Nmap, Nessus",
+            "  • Hacking con PowerShell, scripting en Bash y Python",
+            "  • Honeypots, seguridad wireless y de aplicaciones web",
+            "  • Hardware de servidor IBM, centros de datos y redes",
+            "",
+            "Habilidades personales",
+            "──────────────────────",
+            "  • Trabajo en equipo y organización de proyectos",
+            "  • Capacidad para explicar temas técnicos a distintos perfiles",
+            "  • Alta motivación por seguir aprendiendo, especialmente en",
+            "    ciberseguridad y también en idiomas."
+          ]
+        }
+      }
+    };
+
+    const LANGUAGE_SWITCH_MESSAGES = {
+      de: [
+        "",
+        "Sprache auf Deutsch umgestellt.",
+        "Ab jetzt werden die Befehlsausgaben auf Deutsch angezeigt.",
+        "Du kannst wieder auf Spanisch wechseln mit: idioma",
+        "oder indem du: sprache eingibst."
+      ],
+      es: [
+        "",
+        "Idioma cambiado a español.",
+        "A partir de ahora, las salidas de los comandos aparecerán en español.",
+        "Puedes volver al alemán ejecutando: sprache",
+        "o escribiendo: idioma."
+      ]
+    };
+
+    function updateHintPill() {
+      hintEl.innerHTML = LANGUAGE_DATA[currentLang].hintHTML;
+    }
+
+    // Witzige / sicherheitsbezogene Antworten, abhängig von der Sprache
+    function dangerousResponse(cmd, lang) {
+      const lower = cmd.toLowerCase();
+
+      // su / sudo
+      if (lower === "sudo su -" || lower === "sudo su root" || lower === "su root" || lower === "sudo su - root") {
+        if (lang === "de") {
+          return [
+            "",
+            "Netter Versuch.",
+            "Der SOC hat gerade einen stillen Alarm ausgelöst und trotzdem freundlich",
+            "„Access denied“ zurückgegeben.",
+            "Dieser Server zeigt nur meinen Lebenslauf – Root bleibt trotzdem tabu."
+          ];
+        } else {
+          return [
+            "",
+            "Buen intento.",
+            "El SOC acaba de levantar una pequeña alarma silenciosa",
+            "y aun así te devuelve amablemente un \"Access denied\".",
+            "Este servidor solo muestra mi currículum: el root se queda donde está."
+          ];
+        }
+      }
+
+      // passwd / shadow
+      if (lower.startsWith("cat /etc/passwd")) {
+        if (lang === "de") {
+          return [
+            "",
+            "root:x:0:0:Bank-Root:/root:/bin/bash",
+            "ruben:x:1000:1000:IT-Security-Administrator:/home/ruben:/bin/zsh",
+            "socbot:x:1337:1337:Alarmiert, wenn du zu neugierig wirst:/var/log:/usr/sbin/nologin",
+            "",
+            
+          ];
+        } else {
+          return [
+            "",
+            "root:x:0:0:Bank-Root:/root:/bin/bash",
+            "ruben:x:1000:1000:IT-Security-Administrator:/home/ruben:/bin/zsh",
+            "socbot:x:1337:1337:Alerta cuando te pones demasiado curioso:/var/log:/usr/sbin/nologin",
+            "",
+            
+          ];
+        }
+      }
+
+      if (lower.startsWith("cat /etc/shadow")) {
+        if (lang === "de") {
+          return [
+            "",
+            "cat: /etc/shadow: Zugriff verweigert",
+            "Hinweis: Selbst ein Ethical Hacker kennt seine Grenzen.",
+            "Versuch lieber: ich, berufserfahrung, studium oder zertifikate."
+          ];
+        } else {
+          return [
+            "",
+            "cat: /etc/shadow: Permiso denegado",
+            "Recuerda: incluso un ethical hacker tiene sus límites.",
+            "Mejor prueba con: ich, berufserfahrung, studium o zertifikate."
+          ];
+        }
+      }
+
+      // rm -rf /
+      if (lower === "rm -rf /" || lower.startsWith("rm -rf /")) {
+        if (lang === "de") {
+          return [
+            "",
+            "rm: radikale Maßnahme erkannt.",
+            "Der Server hat beschlossen, lieber deinen Lebenslauf zu behalten",
+            "als sich selbst zu löschen.",
+            "Aktion abgebrochen. Dein Karma bleibt unbeschädigt."
+          ];
+        } else {
+          return [
+            "",
+            "rm: se ha detectado una medida un poco extrema.",
+            "El servidor ha decidido conservar tu currículum",
+            "en lugar de borrarse a sí mismo.",
+            "Acción cancelada. Tu karma sigue intacto."
+          ];
+        }
+      }
+
+      // shutdown
+      if (lower === "shutdown -h now" || lower.startsWith("shutdown")) {
+        if (lang === "de") {
+          return [
+            "",
+            "Shutdown angefordert...",
+            "…",
+            "…",
+            "Abgelehnt.",
+            "Dieser Lebenslauf bleibt online, bis der Recruiter fertig gelesen hat."
+          ];
+        } else {
+          return [
+            "",
+            "Apagado solicitado...",
+            "…",
+            "…",
+            "Petición denegada.",
+            "Este currículum seguirá encendido hasta que el recruiter termine de leer."
+          ];
+        }
+      }
+
+      // env
+      if (lower === "env" || lower === "printenv") {
+        if (lang === "de") {
+          return [
+            "",
+            "LANG=de_DE.UTF-8",
+            "LOCATION=Frankfurt_am_Main",
+            "ROLE=IT_Security_Administrator_SOC",
+            "MINDSET=offen_pragmatisch_sicherheitsbewusst",
+            "FAMILY=verheiratet_2_kinder",
+            "HUMOR=aktiv",
+            "ROOT_ACCESS=nein",
+            "",
+            "Umgebungsvariablen teilweise anonymisiert – SOC-Regeln eben."
+          ];
+        } else {
+          return [
+            "",
+            "LANG=es_ES.UTF-8",
+            "LOCATION=Frankfurt_am_Main",
+            "ROLE=IT_Security_Administrator_SOC",
+            "MINDSET=abierto_pragmático_consciente_de_la_seguridad",
+            "FAMILY=casado_2_hijos",
+            "HUMOR=activo",
+            "ROOT_ACCESS=no",
+            "",
+            "Variables de entorno parcialmente anonimizadas: cosas del SOC."
+          ];
+        }
+      }
+
+      // ping
+      if (lower.startsWith("ping ")) {
+        const target = cmd.trim().split(/\s+/).slice(1).join(" ") || "unknown";
+        if (lang === "de") {
+          return [
+            "",
+            `PING ${target} (${target}): 56 data bytes`,
+            "64 bytes from blue-team.local:   icmp_seq=1 ttl=64 time=0.42 ms",
+            "64 bytes from red-team.local:    icmp_seq=2 ttl=64 time=0.38 ms",
+            "64 bytes from family-time.local: icmp_seq=3 ttl=64 time=0.41 ms",
+            "",
+            `--- ${target} ping statistics ---`,
+            "3 packets transmitted, 3 packets received, 0.0% packet loss",
+            "Hinweis: Latenz zu Kaffee-Quelle ist noch geringer."
+          ];
+        } else {
+          return [
+            "",
+            `PING ${target} (${target}): 56 data bytes`,
+            "64 bytes desde blue-team.local:   icmp_seq=1 ttl=64 time=0.42 ms",
+            "64 bytes desde red-team.local:    icmp_seq=2 ttl=64 time=0.38 ms",
+            "64 bytes desde family-time.local: icmp_seq=3 ttl=64 time=0.41 ms",
+            "",
+            `--- ${target} ping statistics ---`,
+            "3 packets transmitted, 3 packets received, 0.0% packet loss",
+            "La latencia hasta la fuente de café es incluso menor."
+          ];
+        }
+      }
+
+      // find
+      if (lower.startsWith("find / -name")) {
+        if (lang === "de") {
+          return [
+            "",
+            "find: ‘/root’: Zugriff verweigert",
+            "find: ‘/etc’:  Zugriff verweigert",
+            "find: ‘/var’:  Zugriff verweigert",
+            "",
+            "Ich sehe, du suchst tief.",
+            "Die spannendsten Dateien heißen hier aber:",
+            "  \"berufserfahrung\", \"studium\" und \"zertifikate\"."
+          ];
+        } else {
+          return [
+            "",
+            "find: ‘/root’: Permiso denegado",
+            "find: ‘/etc’:  Permiso denegado",
+            "find: ‘/var’:  Permiso denegado",
+            "",
+            "Veo que estás buscando bastante profundo.",
+            "Pero los ficheros más interesantes aquí se llaman:",
+            "  \"berufserfahrung\", \"studium\" y \"zertifikate\"."
+          ];
+        }
+      }
+
+      return null;
+    }
+
+    function addLine(text, className = "") {
+      const div = document.createElement("div");
+      div.className = "line" + (className ? " " + className : "");
+      div.textContent = text;
+      screen.appendChild(div);
+    }
+
+    function addBlock(lines, className = "") {
+      lines.forEach(l => addLine(l, className));
+    }
+
+    function addPromptEcho(command) {
+      addLine(`${PROMPT_TEXT} ${command}`);
+    }
+
+    function scrollToBottom() {
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function handleClear() {
+      screen.innerHTML = "";
+      const langData = LANGUAGE_DATA[currentLang];
+      addBlock(langData.clearLines, "muted");
+    }
+
+    function handleLanguageSwitch() {
+      if (currentLang === "de") {
+        currentLang = "es";
+        addBlock(LANGUAGE_SWITCH_MESSAGES.es, "amber");
+      } else {
+        currentLang = "de";
+        addBlock(LANGUAGE_SWITCH_MESSAGES.de, "amber");
+      }
+      updateHintPill();
+    }
+
+    function handleCommand(raw) {
+      const trimmed = raw.trim();
+      if (!trimmed) return;
+
+      addPromptEcho(trimmed);
+
+      // Sicherheits-/Spaßbefehle zuerst behandeln
+      const funny = dangerousResponse(trimmed, currentLang);
+      if (funny) {
+        addBlock(funny);
+        return;
+      }
+
+      const parts = trimmed.toLowerCase().split(/\s+/);
+      const first = parts[0];
+      const canonical = ALIASES.get(first) || first;
+      const langData = LANGUAGE_DATA[currentLang];
+
+      if (canonical === "clear") {
+        handleClear();
+        return;
+      }
+
+      if (canonical === "help") {
+        addBlock(langData.helpLines);
+        return;
+      }
+
+      if (canonical === "language") {
+        handleLanguageSwitch();
+        return;
+      }
+
+      // Hauptbefehle mit CV-Inhalten
+      if (langData.commands[canonical]) {
+        addBlock(langData.commands[canonical]);
+        return;
+      }
+
+      // Kleine Shell-Boni
+      if (canonical === "ls" || canonical === "dir") {
+        addBlock(langData.lsLines, "dim");
+        return;
+      }
+
+      if (canonical === "whoami") {
+        addBlock(langData.whoamiLines, "dim");
+        return;
+      }
+
+      if (canonical === "pwd") {
+        addBlock(langData.pwdLines, "dim");
+        return;
+      }
+
+      if (first === "cat") {
+        addBlock(langData.catGenericLines, "muted");
+        return;
+      }
+
+      // Unbekannte Befehle
+      addBlock(langData.unknown(trimmed), "muted");
+    }
+
+    function bootSequence() {
+      const now = new Date();
+      const lastLogin = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 2);
+
+      const fmt = (d) =>
+        d.toLocaleString("de-DE", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+      addBlock([
+        "Connecting to lebenslauf.frankfurt.local...",
+        "Connection established.",
+        "Authentifizierung erforderlich.",
+        "Password: ********",
+        "Authentifizierung erfolgreich.",
+        `Last login: ${fmt(lastLogin)} from 192.168.23.42`,
+        "",
+        "Willkommen, Rubén.",
+        ""
+      ], "dim");
+    }
+
+    cmdInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const value = cmdInput.value;
+        cmdInput.value = "";
+        handleCommand(value);
+        scrollToBottom();
+        setTimeout(() => cmdInput.focus(), 0);
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const terminal = e.target.closest(".terminal");
+      if (terminal) cmdInput.focus();
+    });
+
+    // Start
+    bootSequence();
+    updateHintPill();
+    cmdInput.focus();
+    scrollToBottom();
+  </script>
+</body>
+</html>
