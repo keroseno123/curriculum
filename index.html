@@ -100,11 +100,12 @@
     #screen{
       flex:1;
       overflow-y:auto;
+      overflow-x:auto;
       padding-right: 6px;
       scrollbar-width: thin;
       scrollbar-color: rgba(140,255,140,0.35) transparent;
     }
-    #screen::-webkit-scrollbar{ width: 8px; }
+    #screen::-webkit-scrollbar{ width: 8px; height: 8px; }
     #screen::-webkit-scrollbar-thumb{
       background: rgba(140,255,140,0.25);
       border-radius: 8px;
@@ -116,6 +117,14 @@
       font-size: clamp(12px, 1.35vw, 15px);
       line-height: 1.45;
       margin: 0 0 2px 0;
+    }
+
+    /* ASCII art: tamaño fijo y sin wrapping */
+    .line.ascii{
+      white-space: pre;
+      font-size: 9px;
+      line-height: 9px;
+      word-break: normal;
     }
 
     /* Estilos por “tipo” de salida */
@@ -211,8 +220,6 @@ $$ |     $$   ____|$$ |  $$ |$$   ____|$$ |  $$ | \____$$\ $$ |$$  __$$ |$$ |  $
 $$$$$$$$\\$$$$$$$\ $$$$$$$  |\$$$$$$$\ $$ |  $$ |$$$$$$$  |$$ |\$$$$$$$ |\$$$$$$  |$$ |                             
 \________|\_______|\_______/  \_______|\__|  \__|\_______/ \__| \_______| \______/ \__|                             
                                                                                                                     
-                                                                                                                    
-                                                                                                                    
 $$$$$$$\            $$\                                  $$$$$$\                                  $$\               
 $$  __$$\           $$ |                                $$  __$$\                                 $$ |              
 $$ |  $$ |$$\   $$\ $$$$$$$\   $$$$$$\  $$$$$$$\        $$ /  $$ | $$$$$$$\  $$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\  
@@ -221,17 +228,6 @@ $$  __$$< $$ |  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |      $$  __$$ |$$ /      $$ /
 $$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |      $$ |  $$ |$$ |      $$ |  $$ | \____$$\   $$ |$$\ $$  __$$ |
 $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$$$$  |$$$$$$$  |  \$$$$  |\$$$$$$$ |
 \__|  \__| \______/ \_______/  \_______|\__|  \__|      \__|  \__| \_______| \______/ \_______/    \____/  \_______|
-                                                                                                                    
-                                                                                                                    
-                                                                                                                    
-                                     $$$$$$\                                                                        
-                                    $$  __$$\                                                                       
-                                    $$ /  \__| $$$$$$\  $$$$$$$\  $$$$$$$$\                                         
-                                    \$$$$$$\   \____$$\ $$  __$$\ \____$$  |                                        
-                                     \____$$\  $$$$$$$ |$$ |  $$ |  $$$$ _/                                         
-                                    $$\   $$ |$$  __$$ |$$ |  $$ | $$  _/                                           
-                                    \$$$$$$  |\$$$$$$$ |$$ |  $$ |$$$$$$$$\                                         
-                                     \______/  \_______|\__|  \__|\________| 
       </pre>
       <div class="subtitle">
         <strong>Willkommen auf dem Server, der alle Daten über mich enthält.</strong>
@@ -252,6 +248,40 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
       </div>
     </section>
   </main>
+
+  <!-- ASCII (Tag 80x30) para mostrar al principio de "ich" SIN deformar -->
+  <template id="ich-ascii-template">
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▀░░░░░░░┌,::┌:'``&nbsp;&nbsp;&nbsp;`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;``&nbsp;&nbsp;``&nbsp;&nbsp;&nbsp;``^`└░▀▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░░``.:'''.&nbsp;&nbsp;&nbsp;&nbsp;.....&nbsp;`'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`'`&nbsp;'░╫▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓▓▓▓▓▓▓▓▒░'░░░░,~```'''```&nbsp;``'''```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`&nbsp;²╫▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓▓▓▓▓▓▓▒░`,░░░'''`,.,`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└╫▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓▓███▓▌░`,'░░`'.`,"```&nbsp;&nbsp;&nbsp;&nbsp;``&nbsp;`'`&nbsp;&nbsp;`'`&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓████▓░,`'¡:&nbsp;&nbsp;,¡:'¡¡,¡¡░░`┌'`'```':'``.'.``&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╙▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓██████Ü░`,"``&nbsp;&nbsp;░"`,░░▒▒░░░¡``&nbsp;.'.:'"``~,¡``;¡:&nbsp;&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╟▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓█████▓░░&nbsp;```'`~r'¡░░░░░░░░┌¡¡=`,¡,`,¡╖╖┘,░░▒▒¡░░░░`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╫▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓██████▓░``&nbsp;`&nbsp;&nbsp;``:''▒▒▒░,╖╥╖~~└░p░¡`,└▒░╖║▒▒▒░p▒▒▒░░┌&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╫▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓███████▒¡&nbsp;`&nbsp;`&nbsp;&nbsp;''`&nbsp;└▒▒▒╣╣╢╣╢╣@@@@@╢▒╢▒▒▒▒╢╣╢╣╢▒▒▒▒░░&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓████████▓░¡,`&nbsp;&nbsp;&nbsp;',`'¿╖╖@╢╣╣╣▓╣╢▓▓╢▓╣▓▓▓╣╣╣╣╣▒▒▒▒▒▒░░░░&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╟▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+█▓███████▓▌░,,&nbsp;&nbsp;,░p@╣╢╣▒▒╢▒╜╨╣╢▒╢╢╢╣╣╣╣╣▒▒▒╜░'``&nbsp;,&nbsp;,,.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓███████▓▒▒▒░''&nbsp;░╢▒░````&nbsp;.,,,,¡░░▒▒▒▒▒▒▒▒░░¡:"'''░"└░░░¡¡&nbsp;&nbsp;&nbsp;&nbsp;▐▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓██████▌░░░░▒░`&nbsp;║▓▒╥▒▒╜╙└'```,└└░░▒▒╢╣▒▒░░░,░░,,¡╖╖╓;¿░░░░&nbsp;&nbsp;└▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓██████▒░░░░▒░,.▓▓▒▒░,╓╖╖╖╥╖╖░░░▒░▒▒╢╫▓╣▒░░▒▒▒▒▒▒▒▒▒▒▒▒░░░░&nbsp;┌▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓███████░░▒▒▒░░:▓▓╣▒╢╣▒▒▒▒▒▒░▒▒▒▒▒▒▒╢╫▓╣▒▒▒▒▒▒▒▒▒▒╢╣▒▒▒▒░░░&nbsp;└╟▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓████████▌░░▒░░,▓▓▓╣▒╣╢╢╢╣╢╣╣╢╢╣╣▒╢╣╢╣▓╣╣▒▒▒▒▒╢╢╣╢╣▒▒▒▒▒░░░;░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓██████████▒░▒░░▐▓╣╣▒╢╢╢╣╢╢╢╢╢╣▒▒▒╢╢╫▓▓╣╣▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+████████████▒▒▒▒┐▓╣▒▒╢╣╣▒╢╣▒▒▒▒▒▒▒▒╢▓╣╢╢╣▒▒▒░▒▒▒▒▒▒▒▒▒▒▒░░░@▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+█████████████▒▒▒▒╫╣╣▒▒▒▒▒▒▒▒▒░░▒▒╫╢╫▓╣╢╣▒▒▒░▒░▒▒▒▒▒▒▒▒░░░░]▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+███████████████▓▄▓▓╣▒▒▒▒▒▒▒░░▒▒▒▒░░░╜▒▒▒▒░░░░▒▒▒▒░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+██████████████████▓╣▒▒▒▒▒░░░▒▒▒▒▒░░░░░░░░░░░░░▒░░░░░░░░░░╞▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+███████████████████▓╣▒▒▒▒░░▒▒▒▒▒▒▒▒░░░░░░░░░░░░"`,░░▒▒░░╞▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+████████████████████▓▒▒▒▒▒▒░░,&nbsp;&nbsp;'░░░░░░░░░░╖╖░`,░▒▒░▒░░░▀▀▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+█████████████████████▓▒▒▒▒▒▒░▒▒░¡░╙▒╬▒╣╣╫╢╣╣░;░░▒▒░░░░░░&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╙▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+█████████████████████▓▓▓▒▒▒▒░░▒▒▒░░░░░░░░░░░░░░▒░░░░░░░░&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+█████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▀▀▀░░╫╣▒▒▒░▒▒▒▒▒▒░░░░░░░░░░░░░░░░░░░░&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/²▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▓▓▓▓▓╣▒▒▒╙▒▒▒░░░"``&nbsp;,░&nbsp;░"╣╢▒▒▒▒▒▒▒▒▒▒░░░░░░░▒▒▒▒▒░░░░░░░¡&nbsp;&nbsp;&nbsp;&nbsp;:,`╠▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+▒░▒▒▒░░░░░░╜Y░,``&nbsp;./ƒ/j░&nbsp;╢▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░¡~&nbsp;'.```╟▓▓▓▓▓▓▓▓▓▓▓▓▓▓<br>
+░░░░``&nbsp;&nbsp;┌,┘░└'~,'~░}░`▒`&nbsp;]▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░└░`,`'&nbsp;&nbsp;&nbsp;&nbsp;,░╙▓╢▓▓▓▓▓▓▓▓▓▓<br>
+  </template>
 
   <script>
     /* -------------------------------------------------------------------------
@@ -282,9 +312,11 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
       ["personal", "daten"],
       ["personaldata", "daten"],
       ["datos", "daten"],
+
       ["sprachen", "sprachen"],
       ["languages", "sprachen"],
       ["idiomas", "sprachen"],
+
       ["kurse", "kurse"],
       ["courses", "kurse"],
       ["cursos", "kurse"],
@@ -319,7 +351,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
         {text:"──────────────────", cls:"rule"},
         {text:"„Geheime“ Spaß-Befehle (harmlos, nur Gags):", cls:"muted"},
         {text:" sudo su -", cls:"accent"},
-        {text:" sudo su - root", cls:"accent"},
         {text:" su root", cls:"accent"},
         {text:" cat /etc/passwd", cls:"accent"},
         {text:" cat /etc/shadow", cls:"accent"},
@@ -332,8 +363,9 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
         {text:" sudo apt update", cls:"accent"},
         {text:" neofetch", cls:"accent"},
         {text:" vim", cls:"accent"},
+        {text:" uname -a", cls:"accent"},
         {text:"", cls:""},
-        {text:"Hinweis: In dieser CV-Sandbox wird nichts wirklich ausgeführt.", cls:"muted"},
+        {text:"Hinweis: In dieser CV-Sandbox wird nichts wirklich ausgeführt, keine Sorge.", cls:"muted"},
       ],
       es: [
         {text:"", cls:""},
@@ -354,6 +386,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
         {text:" sudo apt update", cls:"accent"},
         {text:" neofetch", cls:"accent"},
         {text:" vim", cls:"accent"},
+        {text:" uname -a", cls:"accent"},
         {text:"", cls:""},
         {text:"Nota: en esta sandbox del CV no se ejecuta nada peligroso.", cls:"muted"},
       ]
@@ -379,6 +412,30 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
 
       return ["", `total ${files.length}`, ...rows, ""];
     }
+
+    // Lee el ASCII del <template>, respetando &nbsp; y los <br>
+    function parseIchAsciiFromTemplate() {
+      const tpl = document.getElementById("ich-ascii-template");
+      if (!tpl) return [];
+
+      const frag = tpl.content.cloneNode(true);
+      let out = "";
+
+      (function walk(node) {
+        node.childNodes.forEach(n => {
+          if (n.nodeType === Node.TEXT_NODE) out += n.nodeValue;
+          else if (n.nodeType === Node.ELEMENT_NODE && n.tagName === "BR") out += "\n";
+          else if (n.nodeType === Node.ELEMENT_NODE) walk(n);
+        });
+      })(frag);
+
+      const lines = out.replace(/\r/g, "").split("\n");
+      if (lines.length && lines[lines.length - 1] === "") lines.pop(); // solo el final
+
+      return lines.map(t => ({ text: t, cls: "ascii" }));
+    }
+
+    const ICH_ASCII_LINES = parseIchAsciiFromTemplate();
 
     const LANGUAGE_DATA = {
       de: {
@@ -432,6 +489,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             {text:"", cls:""},
             {text:"Kurzprofil", cls:"topic"},
             {text:"──────────", cls:"rule"},
+            {text:"", cls:""},
             {text:"Ich bin Rubén – IT Security Administrator in Frankfurt am Main und seit 2012 in Deutschland.", cls:""},
             {text:"Ich komme aus Cáceres (Spanien) und habe über die Jahre in Data Centern,", cls:""},
             {text:"Field Service, als Penetration Tester und heute in der IT-Sicherheit einer Bank gearbeitet.", cls:""},
@@ -445,7 +503,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             {text:"Interessen:", cls:"subtopic"},
             {text:" • Offensive & defensive IT-Sicherheit (Red Team ⇄ SOC)", cls:""},
             {text:" • Security-Tools & Linux-Administration in kritischen Umgebungen", cls:""},
-            {text:" • Automatisierung (Scripting, wiederholbare Abläufe, weniger „Handarbeit“)", cls:""},
+            {text:" • Automatisierung", cls:""},
             {text:"", cls:""},
             {text:"Mein Ziel:", cls:"subtopic"},
             {text:"Security und Linux-Administration, die in der Praxis funktioniert –", cls:""},
@@ -604,7 +662,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
           {text:"", cls:""},
           {text:"Comandos disponibles", cls:"topic"},
           {text:"───────────────────", cls:"rule"},
-          {text:" ich → Perfil breve (técnico, pero con tono cercano).", cls:""},
+          {text:" ich → Perfil breve (técnico, tono cercano).", cls:""},
           {text:" datos → Datos personales (cortito).", cls:""},
           {text:" berufserfahrung → Experiencia profesional.", cls:""},
           {text:" studium → Formación.", cls:""},
@@ -637,7 +695,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
         catGenericLines: [
           {text:"", cls:""},
           {text:"cat: el acceso a este fichero está limitado en este entorno de currículum.", cls:"muted"},
-          {text:"Si quieres info, mejor usa: ich, berufserfahrung, studium, kurse/cursos, zertifikate, sprachen.", cls:"muted"},
+          {text:"Si quieres info, mejor usa: ich, berufserfahrung, studium, cursos, zertifikate, sprachen.", cls:"muted"},
           {text:"", cls:""}
         ],
         unknown: (cmd) => ([
@@ -649,6 +707,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             {text:"", cls:""},
             {text:"Perfil breve", cls:"topic"},
             {text:"────────────", cls:"rule"},
+            {text:"", cls:""},
             {text:"Soy Rubén: IT Security Administrator en Fráncfort del Meno y vivo en Alemania desde 2012.", cls:""},
             {text:"Vengo de Cáceres (España) y he pasado por data centers, field service,", cls:""},
             {text:"pentesting y ahora seguridad en una entidad financiera.", cls:""},
@@ -657,7 +716,7 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             {text:"• Linux: troubleshooting, administración limpia, estabilidad y automatización.", cls:""},
             {text:"• Cuando hay lío: me pongo metódico, mantengo la calma y voy al grano.", cls:""},
             {text:"• Comunicación: me gusta que mi equipo y otros departamentos entiendan el “por qué”.", cls:""},
-            {text:"• Eficiencia: soluciones buenas y a tiempo (sin dramas) mejor que perfección eterna.", cls:""},
+            {text:"• Eficiencia: soluciones buenas y a tiempo mejor que perfección eterna.", cls:""},
             {text:"", cls:""},
             {text:"Intereses:", cls:"subtopic"},
             {text:" • Seguridad ofensiva y defensiva (Red Team ⇄ SOC)", cls:""},
@@ -843,7 +902,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
     function funnyResponse(cmd, lang) {
       const lower = cmd.toLowerCase().trim();
 
-      // su / sudo root
       if (lower === "sudo su -" || lower === "sudo su root" || lower === "su root" || lower === "sudo su - root") {
         return (lang === "de")
           ? [
@@ -862,7 +920,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // passwd / shadow
       if (lower.startsWith("cat /etc/passwd")) {
         return (lang === "de")
           ? [
@@ -897,7 +954,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // rm -rf /
       if (lower === "rm -rf /" || lower.startsWith("rm -rf /")) {
         return (lang === "de")
           ? [
@@ -916,7 +972,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // shutdown
       if (lower === "shutdown -h now" || lower.startsWith("shutdown")) {
         return (lang === "de")
           ? [
@@ -937,7 +992,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // env/printenv
       if (lower === "env" || lower === "printenv") {
         return (lang === "de")
           ? [
@@ -945,7 +999,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
               {text:"LANG=de_DE.UTF-8", cls:""},
               {text:"LOCATION=Frankfurt_am_Main", cls:""},
               {text:"ROLE=IT_Security_Administrator_Linux_SOC", cls:""},
-              {text:"MINDSET=ruhig_pragmatisch_sicherheitsbewusst", cls:""},
               {text:"FOCUS=linux_admin_troubleshooting_automatisierung", cls:""},
               {text:"ROOT_ACCESS=nein", cls:"danger"},
               {text:"", cls:""},
@@ -956,7 +1009,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
               {text:"LANG=es_ES.UTF-8", cls:""},
               {text:"LOCATION=Frankfurt_am_Main", cls:""},
               {text:"ROLE=IT_Security_Administrator_Linux_SOC", cls:""},
-              {text:"MINDSET=calma_pragmatismo_seguridad", cls:""},
               {text:"FOCUS=linux_admin_troubleshooting_automatizacion", cls:""},
               {text:"ROOT_ACCESS=no", cls:"danger"},
               {text:"", cls:""},
@@ -964,7 +1016,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // ping <target>
       if (lower.startsWith("ping ")) {
         const target = cmd.trim().split(/\s+/).slice(1).join(" ") || "unknown";
         return (lang === "de")
@@ -992,7 +1043,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // find / -name ...
       if (lower.startsWith("find / -name")) {
         return (lang === "de")
           ? [
@@ -1017,7 +1067,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // systemctl status ...
       if (lower.startsWith("systemctl status")) {
         const svc = cmd.trim().split(/\s+/).slice(2).join(" ") || "cv-terminal.service";
         return (lang === "de")
@@ -1041,7 +1090,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // apt update
       if (lower === "sudo apt update" || lower === "apt update") {
         return (lang === "de")
           ? [
@@ -1062,7 +1110,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // neofetch
       if (lower === "neofetch") {
         return (lang === "de")
           ? [
@@ -1099,7 +1146,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // vim
       if (lower === "vim" || lower.startsWith("vim ")) {
         return (lang === "de")
           ? [
@@ -1118,7 +1164,6 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
             ];
       }
 
-      // uname -a
       if (lower === "uname -a") {
         return (lang === "de")
           ? [
@@ -1224,6 +1269,20 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
 
       // CV commands
       if (langData.commands[canonical]) {
+        // Inserta el ASCII SOLO al principio de "ich"
+        if (canonical === "ich" && ICH_ASCII_LINES.length) {
+          const base = langData.commands.ich;
+          const ruleIdx = base.findIndex(x => x && typeof x === "object" && x.cls === "rule");
+          const insertAt = (ruleIdx >= 0) ? (ruleIdx + 1) : 0;
+
+          addBlock(base.slice(0, insertAt));
+          addBlock([{text:"", cls:""}]);
+          addBlock(ICH_ASCII_LINES);
+          addBlock([{text:"", cls:""}]);
+          addBlock(base.slice(insertAt));
+          return;
+        }
+
         addBlock(langData.commands[canonical]);
         return;
       }
@@ -1324,4 +1383,3 @@ $$ |  $$ |\$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$ |  $$ |\$$$$$$$\ \$$$
   </script>
 </body>
 </html>
-```
